@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
+import '../providers/theme_provider.dart';
 import '../providers/cart_provider.dart';
 import '../widgets/product_card.dart';
 import 'menu_screen.dart';
@@ -133,6 +135,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
     
     return WillPopScope(
       onWillPop: () async => false, // Disable back button
@@ -140,6 +144,56 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           title: const Text('PizzApp'),
           automaticallyImplyLeading: false, // Remove back button
+          actions: [
+            PopupMenuButton<String>(
+              icon: Icon(
+                themeProvider.isDarkMode
+                    ? Icons.dark_mode
+                    : Icons.light_mode,
+              ),
+              onSelected: (String mode) {
+                themeProvider.setThemeMode(mode);
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(
+                  value: 'system',
+                  child: ListTile(
+                    leading: Icon(Icons.brightness_auto),
+                    title: Text('System'),
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'light',
+                  child: ListTile(
+                    leading: Icon(Icons.light_mode),
+                    title: Text('Light'),
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'dark',
+                  child: ListTile(
+                    leading: Icon(Icons.dark_mode),
+                    title: Text('Dark'),
+                  ),
+                ),
+              ],
+            ),
+            IconButton(
+              icon: const Icon(Icons.shopping_cart),
+              onPressed: () {
+                Navigator.pushNamed(context, '/cart');
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: () async {
+                await authProvider.logout();
+                if (context.mounted) {
+                  Navigator.pushReplacementNamed(context, '/login');
+                }
+              },
+            ),
+          ],
         ),
         body: _screens[_currentIndex],
         bottomNavigationBar: BottomNavigationBar(

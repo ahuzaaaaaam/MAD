@@ -5,6 +5,7 @@ import 'screens/register_screen.dart';
 import 'screens/home_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/cart_provider.dart';
+import 'providers/theme_provider.dart';
 
 void main() {
   runApp(
@@ -12,6 +13,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const MyApp(),
     ),
@@ -23,10 +25,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     
     return MaterialApp(
       title: 'PizzApp',
       debugShowCheckedModeBanner: false,
+      theme: themeProvider.theme,
       initialRoute: '/login',
       routes: {
         '/login': (context) => const LoginScreen(),
