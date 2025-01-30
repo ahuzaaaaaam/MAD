@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/cart_provider.dart';
+import '../widgets/product_card.dart';
 import 'menu_screen.dart';
+import 'customize_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -72,11 +76,59 @@ class _HomeScreenState extends State<HomeScreen> {
               textAlign: TextAlign.center,
             ),
           ),
+          // Featured Products List
+          Builder(
+            builder: (context) {
+              final products = MenuScreen.getFeaturedProducts();
+              return ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: ProductCard(
+                      id: product['id'] as String,
+                      name: product['name'] as String,
+                      description: product['description'] as String,
+                      price: product['price'] as double,
+                      imageUrl: product['imageUrl'] as String,
+                      isVeg: product['isVeg'] as bool,
+                      onAddToCart: () {
+                        final cartProvider = Provider.of<CartProvider>(context, listen: false);
+                        cartProvider.addItem(
+                          id: product['id'] as String,
+                          name: product['name'] as String,
+                          price: product['price'] as double,
+                          imageUrl: product['imageUrl'] as String,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Added ${product['name']} to cart'),
+                            action: SnackBarAction(
+                              label: 'View Cart',
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/cart');
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ],
       ),
     ),
     // Menu Screen
     const MenuScreen(),
+    // Customize Screen
+    const CustomizeScreen(),
   ];
 
   @override
